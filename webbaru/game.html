@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Puzzle Game</title>
+    <link rel="stylesheet" type="text/css" target="_blank" href="style.css" />
+    <div><style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 2px;
+            border: 2px solid #333;
+        }
+        .puzzle-piece {
+            width: 100px;
+            height: 100px;
+            background-size: 400px 400px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="puzzle-container" id="puzzle-container">
+    <!-- Puzzle pieces will be generated here -->
+</div>
+&nbsp;
+<center><button class="logout-btn" onclick="out()">Selesai</button></center>
+<script>
+    const imageUrl = 'https://i.pinimg.com/736x/c3/a7/97/c3a797f90f163aa2c7901057a9bc33ca.jpg'; // Replace with your image URL
+    const puzzleContainer = document.getElementById('puzzle-container');
+
+    let positions = [...Array(16).keys()]; // [0, 1, 2, ..., 15]
+    let shuffledPositions = shuffleArray([...positions]);
+
+    shuffledPositions.forEach((position, index) => {
+        const x = (position % 4) * 100;
+        const y = Math.floor(position / 4) * 100;
+
+        const piece = document.createElement('div');
+        piece.classList.add('puzzle-piece');
+        piece.style.backgroundImage = `url(${imageUrl})`;
+        piece.style.backgroundPosition = `-${x}px -${y}px`;
+        piece.dataset.index = index;
+        piece.draggable = true;
+
+        piece.addEventListener('dragstart', handleDragStart);
+        piece.addEventListener('dragover', handleDragOver);
+        piece.addEventListener('drop', handleDrop);
+
+        puzzleContainer.appendChild(piece);
+    });
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function handleDragStart(e) {
+        e.dataTransfer.setData('text/plain', e.target.dataset.index);
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const draggedIndex = e.dataTransfer.getData('text/plain');
+        const targetIndex = e.target.dataset.index;
+
+        const draggedPiece = puzzleContainer.querySelector(`[data-index='${draggedIndex}']`);
+        const targetPiece = puzzleContainer.querySelector(`[data-index='${targetIndex}']`);
+
+        const draggedPieceBackground = draggedPiece.style.backgroundPosition;
+        const targetPieceBackground = targetPiece.style.backgroundPosition;
+
+        draggedPiece.style.backgroundPosition = targetPieceBackground;
+        targetPiece.style.backgroundPosition = draggedPieceBackground;
+    }
+</script>
+<script>
+    function out(){
+    window.location.href = "index.html";
+}
+</script>
+</div>
+</body>
+</html>
